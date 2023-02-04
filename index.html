@@ -1,0 +1,172 @@
+<html>
+ <head>
+  <title>Digitle</title>
+ </head>
+ <style>
+    body {
+        background-color: aqua;
+        font-family: sans-serif;
+    }
+    .row {
+        margin-bottom: 4px;
+    }
+    .square {
+        background-color: lightgray;
+        height: 30px;
+        width: 30px;
+        display: inline-block;
+        vertical-align: middle;
+        text-align: center;
+        line-height: 30px;
+    }
+    .square.wrong {
+        background-color: lightcoral;
+    }
+    .square.right {
+        background-color: lightgreen;
+    }
+    .square.misplaced {
+        background-color: gold;
+    }
+ </style>
+ <body>
+  <h1>Digitle</h1>
+  <div class="gameboard">
+    <div class="row">
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+      <div class="square"></div>
+    </div>
+    <div class="row">
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+      </div> 
+      <div class="row">
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+      </div>
+      <div class="row">
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+      </div>
+      <div class="row">
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+      </div>
+      <div class="row">
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+        <div class="square"></div>
+      </div>
+  </div>
+  <div class="result"></div>
+  <script>
+    let gameStatus = 'playing';
+    let currentRow = 0;
+    let currentSquare = 0;
+    let rightAnswers = Array.from(Math.random().toString().substring(2,7));
+
+    function setSquareValue(row,col,val) {
+      let rowDivs = document.querySelectorAll('.row');
+      let rowDiv = rowDivs[row];
+      let squareDivs = rowDiv.querySelectorAll('.square');
+      let squareDiv = squareDivs[col];
+
+      squareDiv.innerText = val;
+    }
+
+    function getSquareValue(row,col) {
+      let rowDivs = document.querySelectorAll('.row');
+      let rowDiv = rowDivs[row];
+      let squareDivs = rowDiv.querySelectorAll('.square');
+      let squareDiv = squareDivs[col];
+
+      return squareDiv.innerText;
+    }
+
+    function setSquareStatus(row,col,status) {
+      let rowDivs = document.querySelectorAll('.row');
+      let rowDiv = rowDivs[row];
+      let squareDivs = rowDiv.querySelectorAll('.square');
+      let squareDiv = squareDivs[col];
+
+      squareDiv.classList.add(status);
+    }
+    
+    function setResultMessage(message) {
+        let resultDiv = document.querySelector('.result');
+        resultDiv.innerText = message;
+    }
+
+    function checkAnswer() {
+        let rightCount = 0;
+        let misplacedCount = 0;
+        let wrongCount = 0;
+
+        for(let col=0;col<5;col++) {
+            let guess = getSquareValue(currentRow,col);
+            let rightAnswer = rightAnswers[col];
+
+            if (guess === rightAnswer) {
+                setSquareStatus(currentRow,col,'right');
+                rightCount = rightCount + 1;
+            } else if(rightAnswers.includes(guess)) {
+                setSquareStatus(currentRow,col,'misplaced');
+                misplacedCount = misplacedCount + 1;
+            } else {
+                setSquareStatus(currentRow,col,'wrong');
+                wrongCount = wrongCount + 1;
+            }
+        }
+
+        if (rightCount === 5) {
+            gameStatus = 'won';
+            setResultMessage('Congratulations! You won!');
+        } else if (currentRow === 5) {
+            gameStatus = 'lost';
+            setResultMessage('Sorry! The correct answer was ' + rightAnswers.join(''));
+
+        }
+    }
+    
+    function keyPressed(event) {
+        if(gameStatus !== 'playing') {
+            return;
+        }
+
+        if(event.key >= '0' && event.key <= '9' && currentSquare < 5) {
+            setSquareValue(currentRow,currentSquare,event.key);
+            currentSquare = currentSquare + 1;
+        }
+
+        if(event.key === 'Backspace' && currentSquare > 0) {
+            currentSquare = currentSquare - 1;
+            setSquareValue(currentRow,currentSquare,'');
+        }
+
+        if(event.key === 'Enter' && currentSquare === 5) {
+            checkAnswer();
+            currentRow = currentRow + 1;
+            currentSquare = 0;
+        }
+    }
+    document.body.addEventListener('keydown', keyPressed);
+  </script>
+ </body>
+</html>
